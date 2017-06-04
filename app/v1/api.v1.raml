@@ -1,0 +1,50 @@
+#%RAML 0.8
+---
+title: Pandemic BoardGame Backend
+version: v1
+baseUri: http://todo.com
+#List of media type to support
+mediaType:  application/json
+#List of protocols to support for baseUri
+protocols: [ HTTP ]
+
+traits:
+  - creating:
+      responses:
+        201:
+          description: |
+            Everything went well and we created some resource/s for you. Here have some data!
+  - resilient:
+      responses:
+        422:
+          description: |
+            Unprocessable entity.
+            The server cannot make sense of the request, please adhere to the specs.
+  - failable:
+      responses:
+          500:
+            description: |
+              Server error.
+              The server screwed up, the devs have been notified.
+          502:
+            description: |
+              Bad gateway.
+              Application servers are down or under heavy load, please retry, backing off exponentially.
+  - preconditioned:
+      responses:
+        424:
+          description: |
+            A required precondition wasn't met, for example your session might not be valid
+        404:
+          description: |
+            The session_id you used does not exist
+  - default:
+      responses:
+        200:
+          description: |
+            Everything went well, here have some data!
+
+/:
+  is: [ default ]
+  get:
+    description: get hello world
