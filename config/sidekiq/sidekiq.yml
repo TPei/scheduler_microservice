@@ -1,0 +1,7 @@
+---
+:concurrency: 5
+:pidfile: /tmp/sidekiq.pid
+:queues:
+  - default
+:limits:
+  default: 5

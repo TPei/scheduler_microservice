@@ -1,0 +1,27 @@
+version: '2.1'
+services:
+  redis:
+    image: redis
+  web:
+    build: .
+    volumes:
+      - .:/mnt
+      - /tmp:/host_tmp
+      - $HOME/.bashrc:/.bashrc
+      - $HOME/.bash_history:/.bash_history
+      - $HOME/.gitconfig:/.gitconfig
+    environment:
+      - $SSH_AUTH_SOCK:/tmp/agent.sock
+    ports:
+      - "4567:4567"
+    depends_on:
+      - redis
+  sidekiq:
+    build:
+      context: .
+      dockerfile: Dockerfile_sidekiq
+    volumes:
+      - .:/mnt
+      - /tmp:/host_tmp
+    depends_on:
+      - redis

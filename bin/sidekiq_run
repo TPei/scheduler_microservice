@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# source /etc/shell_env
+set -x
+
+cd /mnt
+
+if [ ! -f .env ]; then
+  echo "Creating .env file from .env.sample"
+  cp .env.sample .env
+fi
+
+function run_sidekiq() {
+  bundle exec sidekiq -r ./config/setup_sidekiq.rb -C ./config/sidekiq/sidekiq.yml &
+}
+
+function shutdown_sidekiq() {
+  bundle exec sidekiqctl stop /tmp/sidekiq.pid 27
+}
+
+function wait_for_sidekiq_shutdown() {
+  trap shutdown_sidekiq SIGTERM
+  # waiting for sidekiq process to start
+  while [[ ! -e /tmp/sidekiq.pid ]]; do
+    sleep 0.2
+  done
+  # wait is blocking and waits for sidekiq process to terminate
+  wait $(cat /tmp/sidekiq.pid)
+}
+
+run_sidekiq
+wait_for_sidekiq_shutdown
