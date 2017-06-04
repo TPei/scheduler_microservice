@@ -3,9 +3,7 @@
 require 'app/middleware/sidekiq_logger'
 
 Sidekiq.configure_server do |config|
-  if ENV['REDIS_URL']
-    config.redis = { url: ENV['REDIS_URL' }
-  end
+  config.redis = { url: ENV['REDIS_URL' || 'redis://redis:6379' }
 
   config.server_middleware do |chain|
     chain.add Middleware::SidekiqLogger
