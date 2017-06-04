@@ -3,11 +3,8 @@
 require 'app/middleware/sidekiq_logger'
 
 Sidekiq.configure_server do |config|
-  if ENV['REDIS_SENTINEL_SERVICE']
-    config.redis = {
-      url: 'redis://mymaster',
-      sentinels: [{ host: ENV['REDIS_SENTINEL_SERVICE'], port: '26379' }]
-    }
+  if ENV['REDIS_URL']
+    config.redis = { url: ENV['REDIS_URL' }
   end
 
   config.server_middleware do |chain|
