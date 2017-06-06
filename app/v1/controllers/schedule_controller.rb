@@ -2,7 +2,7 @@
 
 require 'dotenv'
 require 'json'
-require 'active_support'
+require 'active_support/time'
 require './app/workers/infection_schedule_worker'
 
 module Api
@@ -15,7 +15,7 @@ module Api
             halt 422 # unprocessable entity
           end
 
-          time = body['time'] || ENV['DEFAULT_INFECTION_TIME']
+          time = (body['time'] || ENV['DEFAULT_INFECTION_TIME']).to_i
           InfectionScheduleWorker.perform_in(time.seconds, key, time)
           [201, { 'game_key' => key }.to_json]
         end
