@@ -2,7 +2,8 @@
 
 require 'spec_helper'
 require 'dotenv'
-require 'active_support'
+require 'active_support/time'
+require 'sidekiq/testing'
 
 RSpec.describe InfectionScheduleWorker do
   def app
@@ -10,7 +11,11 @@ RSpec.describe InfectionScheduleWorker do
   end
 
   describe 'perform' do
-    it 'calls an endpoint on the main app and reenqueues itselg' do
+    before do
+      allow(Unirest).to receive(:post)
+    end
+
+    it 'calls an endpoint on the main app and reenqueues itself' do
       time = 500
       key = 'some key'
 
@@ -23,7 +28,7 @@ RSpec.describe InfectionScheduleWorker do
       expect(InfectionScheduleWorker).to receive(:perform_in).
         with(time.seconds, key, time)
 
-      InfectionScheduleWorker.perform_async(key, time)
+      InfectionScheduleWorker.new.perform(key, time)
     end
   end
 end

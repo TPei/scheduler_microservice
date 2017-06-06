@@ -1,7 +1,7 @@
 require 'sidekiq'
 require 'unirest'
 require 'dotenv'
-require 'active_support'
+require 'active_support/time'
 
 class InfectionScheduleWorker
   include Sidekiq::Worker
@@ -12,6 +12,6 @@ class InfectionScheduleWorker
       parameters: { game_key: game_key }
     )
 
-    InfectionScheduleWorker.perform_in(time.seconds, key, time)
+    InfectionScheduleWorker.perform_in(time.seconds, game_key, time)
   end
 end
