@@ -2,6 +2,7 @@
 
 require 'dotenv'
 require 'json'
+require 'active_support'
 require './app/workers/infection_schedule_worker'
 
 module Api
@@ -15,7 +16,8 @@ module Api
           end
 
           time = body['time'] || ENV['DEFAULT_INFECTION_TIME']
-          InfectionScheduleWorker.perform_async(key, time)
+          InfectionScheduleWorker.perform_in(time.seconds, key, time)
+          [201, { 'game_key' => key }.to_json]
         end
       end
     end

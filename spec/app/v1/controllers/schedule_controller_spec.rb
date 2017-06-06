@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'sidekiq/testing'
 require 'dotenv'
+require 'active_support'
 require './app/workers/infection_schedule_worker'
 
 RSpec.describe Api::V1::Controllers::ScheduleController do
@@ -11,6 +12,10 @@ RSpec.describe Api::V1::Controllers::ScheduleController do
   end
 
   describe 'GET /schedule' do
+    before do
+      @header = {'CONTENT_TYPE' => 'application/json'}
+    end
+
     context 'with a game key' do
       before do
         @game_key = 'some game key'
@@ -22,33 +27,35 @@ RSpec.describe Api::V1::Controllers::ScheduleController do
         end
 
         it 'enqueues infection_schedule_worker appropriately' do
-          data = { 'game_key' => @game_key, 'time' => @time }
-          post '/schedule', data
+          data = { 'game_key' => @game_key, 'time' => @time }.to_json
+          post '/schedule', data, @header
 
-          expect(InfectionScheduleWorker).to receive(:perform_async).
-            with(@game_key, @time)
-          expect(last_response.status).to eq 200
-          expect(last_response.body).to eq({ 'success' => true }.to_json)
+          expect(InfectionScheduleWorker).to receive(:perform_in).
+            with(@time.seconds, @game_key, @time)
+          expect(last_response.status).to eq 201
+          expect(last_response.body).to eq({ 'game_key' => @game_key }.to_json)
         end
       end
 
       context 'without time given' do
         it 'enqueues infection_schedule_worker with default time' do
-          data = { 'game_key' => @game_key }
-          post '/schedule', data
+          data = { 'game_key' => @game_key }.to_json
+          post '/schedule', data, @header
 
-          expect(InfectionScheduleWorker).to receive(:perform_async).
-            with(@game_key, ENV['DEFAULT_INFECTION_TIME'])
+          time = ENV['DEFAULT_INFECTION_TIME']
 
-          expect(last_response.status).to eq 200
-          expect(last_response.body).to eq({ 'success' => true }.to_json)
+          expect(InfectionScheduleWorker).to receive(:perform_in).
+            with(time.seconds, @game_key, time)
+
+          expect(last_response.status).to eq 201
+          expect(last_response.body).to eq({ 'game_key' => @game_key }.to_json)
         end
       end
     end
 
     context 'without a game key' do
       it 'return a 422' do
-        post '/schedule', {}
+        post '/schedule', {}.to_json, @header
         expect(last_response.status).to eq 422
       end
     end

@@ -1,6 +1,7 @@
 require 'sidekiq'
 require 'unirest'
 require 'dotenv'
+require 'active_support'
 
 class InfectionScheduleWorker
   include Sidekiq::Worker

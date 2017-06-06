@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'dotenv'
+require 'active_support'
 
 RSpec.describe InfectionScheduleWorker do
   def app
