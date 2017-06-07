@@ -1,2 +1,0 @@
-'profile.education.education_degree.value'
-'profile.leisure_time.leisure_time_activity_music.value'
