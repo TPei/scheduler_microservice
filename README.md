@@ -1,4 +1,4 @@
-# CP 17 scheduling component
+# CP 17 scheduling component [![Build Status](https://travis-ci.org/TPei/CP17_scheduler.svg?branch=develop)](https://travis-ci.org/TPei/CP17_scheduler)
 
 A service that receives inputs via a REST endpoint and then continuously schedules new infection spreading for a pandemic game session using sidekiq.
 
