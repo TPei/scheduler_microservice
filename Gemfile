@@ -11,6 +11,7 @@ gem 'rake'
 gem 'redis'
 gem 'sidekiq'
 gem 'sinatra'
+gem 'unirest'
 
 group :development, :test do
   gem 'pry'

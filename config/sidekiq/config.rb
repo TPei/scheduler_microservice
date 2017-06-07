@@ -2,7 +2,7 @@
 
 logger = Logger.new $stdout
 
-Dir[File.expand_path('../../../workers/*.rb', __FILE__)].each do |file|
+Dir[File.expand_path('../../../app/workers/*.rb', __FILE__)].each do |file|
   require file
 end
 
