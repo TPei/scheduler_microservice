@@ -11,7 +11,7 @@ RSpec.describe Api::V1::Controllers::ScheduleController do
     Api::ApiV1
   end
 
-  describe 'GET /schedule' do
+  describe 'POST /schedule' do
     before do
       @header = {'CONTENT_TYPE' => 'application/json'}
     end
