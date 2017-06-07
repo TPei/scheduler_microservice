@@ -7,7 +7,7 @@ WORKDIR /mnt
 COPY Gemfile .
 COPY Gemfile.lock .
 RUN mkdir vendor
-COPY vendor/cache vendor/cache
+# COPY vendor/cache vendor/cache
 RUN bundle install --binstubs
 
 COPY . .
