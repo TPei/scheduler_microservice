@@ -5,6 +5,7 @@ require 'sidekiq/testing'
 require 'dotenv'
 require 'active_support/time'
 require './app/workers/infection_schedule_worker'
+require './app/use_cases/sidekiq_remover'
 
 RSpec.describe Api::V1::Controllers::ScheduleController do
   def app
@@ -58,6 +59,59 @@ RSpec.describe Api::V1::Controllers::ScheduleController do
       it 'return a 422' do
         post '/schedule', {}.to_json, @header
         expect(last_response.status).to eq 422
+      end
+    end
+  end
+
+  describe 'DELETE /schedule'  do
+    context 'if dequeueing if successful' do
+      before do
+        allow(SidekiqRemover).to receive(:dequeue).and_return(true)
+        allow(SidekiqRemover).to receive(:deschedule).and_return(false)
+      end
+
+      it 'deletes all sidekiq jobs with given game_key' do
+        game_key = 'some_key'
+
+        expect(SidekiqRemover).to receive(:dequeue).with(game_key)
+        expect(SidekiqRemover).to receive(:deschedule).with(game_key)
+
+        delete "/schedule/#{game_key}"
+        expect(last_response.status).to eq 200
+      end
+    end
+
+    context 'if descheduling if successful' do
+      before do
+        allow(SidekiqRemover).to receive(:dequeue).and_return(false)
+        allow(SidekiqRemover).to receive(:deschedule).and_return(true)
+      end
+
+      it 'deletes all sidekiq jobs with given game_key' do
+        game_key = 'some_key'
+
+        expect(SidekiqRemover).to receive(:dequeue).with(game_key)
+        expect(SidekiqRemover).to receive(:deschedule).with(game_key)
+
+        delete "/schedule/#{game_key}"
+        expect(last_response.status).to eq 200
+      end
+    end
+
+    context 'if job is not found' do
+      before do
+        allow(SidekiqRemover).to receive(:dequeue).and_return(false)
+        allow(SidekiqRemover).to receive(:deschedule).and_return(false)
+      end
+
+      it 'deletes all sidekiq jobs with given game_key' do
+        game_key = 'some_key'
+
+        expect(SidekiqRemover).to receive(:dequeue).with(game_key)
+        expect(SidekiqRemover).to receive(:deschedule).with(game_key)
+
+        delete "/schedule/#{game_key}"
+        expect(last_response.status).to eq 404
       end
     end
   end
