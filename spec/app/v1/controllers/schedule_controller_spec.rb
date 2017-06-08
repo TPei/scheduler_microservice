@@ -64,34 +64,15 @@ RSpec.describe Api::V1::Controllers::ScheduleController do
   end
 
   describe 'DELETE /schedule'  do
-    context 'if dequeueing if successful' do
+    context 'if deleting is successful' do
       before do
-        allow(SidekiqRemover).to receive(:dequeue).and_return(true)
-        allow(SidekiqRemover).to receive(:deschedule).and_return(false)
+        allow(SidekiqRemover).to receive(:delete_all).and_return(true)
       end
 
       it 'deletes all sidekiq jobs with given game_key' do
         game_key = 'some_key'
 
-        expect(SidekiqRemover).to receive(:dequeue).with(game_key)
-        expect(SidekiqRemover).to receive(:deschedule).with(game_key)
-
-        delete "/schedule/#{game_key}"
-        expect(last_response.status).to eq 200
-      end
-    end
-
-    context 'if descheduling if successful' do
-      before do
-        allow(SidekiqRemover).to receive(:dequeue).and_return(false)
-        allow(SidekiqRemover).to receive(:deschedule).and_return(true)
-      end
-
-      it 'deletes all sidekiq jobs with given game_key' do
-        game_key = 'some_key'
-
-        expect(SidekiqRemover).to receive(:dequeue).with(game_key)
-        expect(SidekiqRemover).to receive(:deschedule).with(game_key)
+        expect(SidekiqRemover).to receive(:delete_all).with(game_key)
 
         delete "/schedule/#{game_key}"
         expect(last_response.status).to eq 200
@@ -100,15 +81,13 @@ RSpec.describe Api::V1::Controllers::ScheduleController do
 
     context 'if job is not found' do
       before do
-        allow(SidekiqRemover).to receive(:dequeue).and_return(false)
-        allow(SidekiqRemover).to receive(:deschedule).and_return(false)
+        allow(SidekiqRemover).to receive(:delete_all).and_return(false)
       end
 
       it 'deletes all sidekiq jobs with given game_key' do
         game_key = 'some_key'
 
-        expect(SidekiqRemover).to receive(:dequeue).with(game_key)
-        expect(SidekiqRemover).to receive(:deschedule).with(game_key)
+        expect(SidekiqRemover).to receive(:delete_all).with(game_key)
 
         delete "/schedule/#{game_key}"
         expect(last_response.status).to eq 404

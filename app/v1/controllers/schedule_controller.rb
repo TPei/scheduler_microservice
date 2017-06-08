@@ -23,8 +23,7 @@ module Api
 
         delete '/schedule/:game_key' do
           game_key = params['game_key']
-          success = SidekiqRemover.dequeue(game_key)
-          success |= SidekiqRemover.deschedule(game_key)
+          success = SidekiqRemover.delete_all(game_key)
           code = 404
           code = 200 if success
           [code, { 'game_key' => game_key }.to_json]
