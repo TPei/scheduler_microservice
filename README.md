@@ -4,7 +4,7 @@ A simple microservice that will call a specified endpoint with a specified paylo
 
 ## How to run
 `docker-compose up -d` (-d so that you don't connect to the log console)
-Go to: http://localhost:4567/v1/
+Go to: http://localhost:4567/v1/documentation to check out endpoints are offered and what input / output data is expected
 
 ## Running specs
 `docker-compose up -d`
