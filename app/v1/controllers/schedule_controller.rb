@@ -3,7 +3,7 @@
 require 'dotenv'
 require 'json'
 require 'active_support/time'
-require './app/workers/infection_schedule_worker'
+require './app/workers/schedule_worker'
 require './app/use_cases/sidekiq_remover'
 
 module Api
@@ -12,21 +12,25 @@ module Api
       class ScheduleController < Sinatra::Base
         post '/schedule' do
           body = JSON.load(request.body.read)
-          unless key = body['game_key']
+
+          endpoint = body['endpoint']
+          payload = body['payload']
+          interval = body['interval'].to_i
+
+          unless endpoint && payload && interval != 0
             halt 422 # unprocessable entity
           end
 
-          time = (body['time'] || ENV['DEFAULT_INFECTION_TIME']).to_i
-          InfectionScheduleWorker.perform_in(time.seconds, key, time)
-          [201, { 'game_key' => key }.to_json]
+          ScheduleWorker.perform_in(interval.seconds, endpoint, payload, interval)
+          [201, { 'id' => SecureRandom.hex }.to_json]
         end
 
-        delete '/schedule/:game_key' do
-          game_key = params['game_key']
-          success = SidekiqRemover.delete_all(game_key)
+        delete '/schedule/:id' do
+          id = params['id']
+          success = SidekiqRemover.delete_all(id)
           code = 404
           code = 200 if success
-          [code, { 'game_key' => game_key }.to_json]
+          [code, { 'id' => id }.to_json]
         end
       end
     end

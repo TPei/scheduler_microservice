@@ -4,7 +4,7 @@ require 'spec_helper'
 require 'sidekiq/testing'
 require 'dotenv'
 require 'active_support/time'
-require './app/workers/infection_schedule_worker'
+require './app/workers/schedule_worker'
 require './app/use_cases/sidekiq_remover'
 
 RSpec.describe Api::V1::Controllers::ScheduleController do
@@ -15,49 +15,45 @@ RSpec.describe Api::V1::Controllers::ScheduleController do
   describe 'POST /schedule' do
     before do
       @header = {'CONTENT_TYPE' => 'application/json'}
+      @body = {
+        endpoint: 'http://some_url.com',
+        payload: {},
+        interval: 100
+      }
     end
 
-    context 'with a game key' do
-      before do
-        @game_key = 'some game key'
+    context 'with valid data' do
+      it 'enqueues schedule_worker appropriately' do
+        expect(ScheduleWorker).to receive(:perform_in).
+          with(@body[:interval], @body[:endpoint], @body[:payload], @body[:interval])
+
+        post '/schedule', @body.to_json, @header
+
+        expect(last_response.status).to eq 201
       end
 
-      context 'with time given' do
-        before do
-          @time = 300
-        end
+      it 'returns a length 16 hex id' do
+        expect(ScheduleWorker).to receive(:perform_in).
+          with(@body[:interval], @body[:endpoint], @body[:payload], @body[:interval])
 
-        it 'enqueues infection_schedule_worker appropriately' do
-          expect(InfectionScheduleWorker).to receive(:perform_in).
-            with(@time.seconds, @game_key, @time)
+        post '/schedule', @body.to_json, @header
 
-          data = { 'game_key' => @game_key, 'time' => @time }.to_json
-          post '/schedule', data, @header
-
-          expect(last_response.status).to eq 201
-          expect(last_response.body).to eq({ 'game_key' => @game_key }.to_json)
-        end
-      end
-
-      context 'without time given' do
-        it 'enqueues infection_schedule_worker with default time' do
-          time = ENV['DEFAULT_INFECTION_TIME'].to_i
-
-          expect(InfectionScheduleWorker).to receive(:perform_in).
-            with(time.seconds, @game_key, time)
-
-          data = { 'game_key' => @game_key }.to_json
-          post '/schedule', data, @header
-
-          expect(last_response.status).to eq 201
-          expect(last_response.body).to eq({ 'game_key' => @game_key }.to_json)
-        end
+        expect(last_response.status).to eq 201
+        body = last_response.body
+        expect(JSON.parse(body)['id']).to match(/[0-9a-fA-F]{16}/)
       end
     end
 
-    context 'without a game key' do
+    context 'with necessary key missing' do
       it 'return a 422' do
         post '/schedule', {}.to_json, @header
+        expect(last_response.status).to eq 422
+      end
+    end
+
+    context 'with interval = 0' do
+      it 'return a 422' do
+        post '/schedule', { endpoint: '', payload: {}, interval: 0 }.to_json, @header
         expect(last_response.status).to eq 422
       end
     end
@@ -70,11 +66,11 @@ RSpec.describe Api::V1::Controllers::ScheduleController do
       end
 
       it 'deletes all sidekiq jobs with given game_key' do
-        game_key = 'some_key'
+        id = 'some_id'
 
-        expect(SidekiqRemover).to receive(:delete_all).with(game_key)
+        expect(SidekiqRemover).to receive(:delete_all).with(id)
 
-        delete "/schedule/#{game_key}"
+        delete "/schedule/#{id}"
         expect(last_response.status).to eq 200
       end
     end
@@ -85,11 +81,11 @@ RSpec.describe Api::V1::Controllers::ScheduleController do
       end
 
       it 'deletes all sidekiq jobs with given game_key' do
-        game_key = 'some_key'
+        id = 'some_id'
 
-        expect(SidekiqRemover).to receive(:delete_all).with(game_key)
+        expect(SidekiqRemover).to receive(:delete_all).with(id)
 
-        delete "/schedule/#{game_key}"
+        delete "/schedule/#{id}"
         expect(last_response.status).to eq 404
       end
     end

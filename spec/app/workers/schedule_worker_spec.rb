@@ -5,7 +5,7 @@ require 'dotenv'
 require 'active_support/time'
 require 'sidekiq/testing'
 
-RSpec.describe InfectionScheduleWorker do
+RSpec.describe ScheduleWorker do
   def app
     Api::ApiV1
   end
