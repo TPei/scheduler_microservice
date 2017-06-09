@@ -53,7 +53,18 @@ RSpec.describe Api::V1::Controllers::ScheduleController do
 
     context 'with interval = 0' do
       it 'return a 422' do
-        post '/schedule', { endpoint: '', payload: {}, interval: 0 }.to_json, @header
+        post '/schedule', {
+          endpoint: 'www.swag.de', payload: {}, interval: 0
+        }.to_json, @header
+        expect(last_response.status).to eq 422
+      end
+    end
+
+    context 'with endpoint not being a valid url' do
+      it 'returns a 422' do
+        post '/schedule', {
+          endpoint: 'not_a_url', payload: {}, interval: 100
+        }.to_json, @header
         expect(last_response.status).to eq 422
       end
     end

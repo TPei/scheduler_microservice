@@ -3,6 +3,7 @@
 require 'dotenv'
 require 'json'
 require 'active_support/time'
+require 'uri'
 require './app/workers/schedule_worker'
 require './app/use_cases/sidekiq_remover'
 
@@ -17,7 +18,7 @@ module Api
           payload = body['payload']
           interval = body['interval'].to_i
 
-          unless endpoint && payload && interval != 0
+          unless endpoint && payload && interval != 0 && endpoint =~ URI::regexp
             halt 422 # unprocessable entity
           end
 
