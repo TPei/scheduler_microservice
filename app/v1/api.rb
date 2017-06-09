@@ -5,7 +5,7 @@ require './app/v1/controllers/schedule_controller'
 module Api
   class ApiV1 < Sinatra::Base
     get '/' do
-      'Hello World'
+      [200, { success: true }.to_json]
     end
 
     get '/documentation' do
