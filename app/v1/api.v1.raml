@@ -40,6 +40,11 @@ traits:
   is: [ default ]
   get:
     description: get hello world
+    responses:
+      200:
+        body:
+          schema: successGetSchema
+          example: !include examples/successGetResponse.json
 
 /schedule:
   is: [ resilient, failable ]
