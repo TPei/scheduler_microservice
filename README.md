@@ -4,11 +4,12 @@ A simple microservice that will call a specified endpoint with a specified paylo
 
 ## How to run
 `docker-compose up -d` (-d so that you don't connect to the log console)
+
 Go to: http://localhost:4567/v1/documentation to check out endpoints are offered and what input / output data is expected
 
 ## Running specs
-`docker-compose up -d`
-`docker exec -it scheduler_microservice_web_1 /bin/bash` to connect to a shell
-`bundle install` if necessary
-`bundle exec rspec` to run tests
-`bundle exec rubocop` to run linter
+- `docker-compose up -d`
+- `docker exec -it scheduler_microservice_web_1 /bin/bash` to connect to a shell
+- `bundle install` if necessary
+- `bundle exec rspec` to run tests
+- `bundle exec rubocop` to run linter
