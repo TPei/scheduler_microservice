@@ -1,4 +1,4 @@
-# scheduling microservice [![Build Status](https://travis-ci.org/TPei/scheduler_microservice.svg?branch=develop)](https://travis-ci.org/TPei/scheduler_microservice)
+# scheduling microservice [![Build Status](https://travis-ci.org/TPei/scheduler_microservice.svg?branch=master)](https://travis-ci.org/TPei/scheduler_microservice)
 A simple microservice that will call a specified endpoint with a specified payload at a specified interval Edit
 
 
