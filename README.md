@@ -8,7 +8,7 @@ Go to: http://localhost:4567/v1/
 
 ## Running specs
 `docker-compose up -d`
-`docker exec -it cp17scheduler_web_1 /bin/bash` to connect to a shell
+`docker exec -it scheduler_microservice_web_1 /bin/bash` to connect to a shell
 `bundle install` if necessary
 `bundle exec rspec` to run tests
 `bundle exec rubocop` to run linter
