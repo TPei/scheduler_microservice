@@ -58,43 +58,23 @@ RSpec.describe SidekiqRemover do
     before do
       @game_key = 'le_key'
       @non_game_key = 'some_other_key'
-
-      InfectionScheduleWorker.perform_in(100.seconds, @non_game_key, 100)
-    end
-
-    after do
-      InfectionScheduleWorker.jobs.clear
     end
 
     context 'with matching jobs' do
-      before do
-        InfectionScheduleWorker.perform_in(100.seconds, @game_key, 100)
-      end
-
       it 'deletes all jobs for a key from given set' do
-        skip 'because of problems testing with actual Sidekiq things'
-        expect(InfectionScheduleWorker.jobs.size).to eq(2)
-        set = Sidekiq::ScheduledSet.new
-        expect(SidekiqRemover.delete(set, @game_key)).to eq(true)
-        expect(InfectionScheduleWorker.jobs.size).to eq(1)
-
-        jobs_args = InfectionScheduleWorker.jobs.map { |job| job['args'] }.flatten
-        expect(jobs_args).not_to include(@game_key)
-        expect(jobs_args).to include(@non_game_key)
+        allow(Sidekiq::ScheduledSet).to receive(:new).and_return([job = double])
+        allow(job).to receive(:args).and_return([@game_key])
+        expect(job).to receive(:delete)
+        expect(SidekiqRemover.delete(Sidekiq::ScheduledSet.new, @game_key)).to eq(true)
       end
     end
 
     context 'with no matching jobs' do
       it 'does nothing' do
-        skip 'because of problems testing with actual Sidekiq things'
-        expect(InfectionScheduleWorker.jobs.size).to eq(1)
-        set = Sidekiq::ScheduledSet.new
-        expect(SidekiqRemover.delete(set, @game_key)).to eq(false)
-        expect(InfectionScheduleWorker.jobs.size).to eq(1)
-
-        jobs_args = InfectionScheduleWorker.jobs.map { |job| job['args'] }.flatten
-        expect(jobs_args).not_to include(@game_key)
-        expect(jobs_args).to include(@non_game_key)
+        allow(Sidekiq::ScheduledSet).to receive(:new).and_return([job = double])
+        allow(job).to receive(:args).and_return([@non_game_key])
+        expect(job).not_to receive(:delete)
+        expect(SidekiqRemover.delete(Sidekiq::ScheduledSet.new, @game_key)).to eq(false)
       end
     end
   end
