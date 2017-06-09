@@ -12,6 +12,6 @@ class ScheduleWorker
       parameters: payload
     )
 
-    ScheduleWorker.perform_in(time.seconds, endpoint, payload, interval)
+    ScheduleWorker.perform_in(interval.seconds, endpoint, payload, interval)
   end
 end

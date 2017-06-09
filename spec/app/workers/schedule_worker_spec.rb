@@ -16,19 +16,20 @@ RSpec.describe ScheduleWorker do
     end
 
     it 'calls an endpoint on the main app and reenqueues itself' do
-      time = 500
-      key = 'some key'
+      endpoint = 'http://www.some_endpoint.com'
+      payload = { key: 'value' }
+      interval = 500
 
       expect(Unirest).to receive(:post).
         with(
-          "#{ENV['MAIN_SERVICE_URL']}/game/infection",
-          parameters: { game_key: key }
+          endpoint,
+          parameters: payload
         )
 
-      expect(InfectionScheduleWorker).to receive(:perform_in).
-        with(time.seconds, key, time)
+      expect(ScheduleWorker).to receive(:perform_in).
+        with(interval.seconds, endpoint, payload, interval)
 
-      InfectionScheduleWorker.new.perform(key, time)
+      ScheduleWorker.new.perform(endpoint, payload, interval)
     end
   end
 end
