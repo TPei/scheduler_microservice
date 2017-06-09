@@ -17,7 +17,7 @@ RSpec.describe Api::V1::Controllers::ScheduleController do
       @header = {'CONTENT_TYPE' => 'application/json'}
       @body = {
         endpoint: 'http://some_url.com',
-        payload: {},
+        payload: { 'key' => '1234' },
         interval: 100
       }
     end
