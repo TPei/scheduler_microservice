@@ -51,6 +51,24 @@ traits:
   post:
     is: [ creating ]
     description: schedules a job
-  delete:
-    is: [ default ]
-    description: deletes a job
+    body:
+      schema: schedulePost
+      example: !include examples/schedulePost.json
+    responses:
+      201:
+        body:
+          schema: schedulePostResponse
+          example: !include examples/schedulePostResponse.json
+  /{id}:
+    delete:
+      is: [ default ]
+      description: deletes a job
+      responses:
+        200:
+          body:
+            schema: scheduleDeleteSuccessResponse
+            example: !include examples/scheduleDeleteSuccessResponse.json
+        404:
+          body:
+            schema: scheduleDeleteFailResponse
+            example: !include examples/scheduleDeleteFailResponse.json

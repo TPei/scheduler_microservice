@@ -1,0 +1,10 @@
+{
+  "endpoint": "https://www.my_url.com",
+  "interval": 500,
+  "payload": {
+    "some": "argument",
+    "another": {
+      "convoluted": "argument"
+    }
+  }
+}

@@ -29,8 +29,15 @@ module Api
         delete '/schedule/:id' do
           id = params['id']
           success = SidekiqRemover.delete_all(id)
-          code = 404
-          code = 200 if success
+          payload = nil
+          code = nil
+          if succes
+            code = 200
+            payload = { success: true }.to_json
+          else
+            code = 404
+            payload = { success: false }.to_json
+          end
           [code, { 'id' => id }.to_json]
         end
       end
