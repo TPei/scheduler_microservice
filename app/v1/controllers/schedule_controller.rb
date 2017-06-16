@@ -22,16 +22,26 @@ module Api
             halt 422 # unprocessable entity
           end
 
-          ScheduleWorker.perform_in(interval.seconds, endpoint, payload, interval)
-          [201, { 'id' => SecureRandom.hex }.to_json]
+          id = SecureRandom.hex
+          ScheduleWorker.perform_in(interval.seconds, id, endpoint, payload, interval)
+          [201, { 'id' => id }.to_json]
         end
 
         delete '/schedule/:id' do
           id = params['id']
           success = SidekiqRemover.delete_all(id)
-          code = 404
-          code = 200 if success
-          [code, { 'id' => id }.to_json]
+          response = nil
+          code = nil
+
+          if success
+            code = 200
+            response = { success: true }.to_json
+          else
+            code = 404
+            response = { success: false }.to_json
+          end
+
+          [code, response]
         end
       end
     end
