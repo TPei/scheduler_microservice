@@ -25,7 +25,7 @@ RSpec.describe Api::V1::Controllers::ScheduleController do
     context 'with valid data' do
       it 'enqueues schedule_worker appropriately' do
         expect(ScheduleWorker).to receive(:perform_in).
-          with(@body[:interval], @body[:endpoint], @body[:payload], @body[:interval])
+          with(@body[:interval], an_instance_of(String), @body[:endpoint], @body[:payload], @body[:interval])
 
         post '/schedule', @body.to_json, @header
 
@@ -34,7 +34,7 @@ RSpec.describe Api::V1::Controllers::ScheduleController do
 
       it 'returns a length 16 hex id' do
         expect(ScheduleWorker).to receive(:perform_in).
-          with(@body[:interval], @body[:endpoint], @body[:payload], @body[:interval])
+          with(@body[:interval], an_instance_of(String), @body[:endpoint], @body[:payload], @body[:interval])
 
         post '/schedule', @body.to_json, @header
 

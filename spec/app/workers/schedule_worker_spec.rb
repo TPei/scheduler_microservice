@@ -19,6 +19,7 @@ RSpec.describe ScheduleWorker do
       endpoint = 'http://www.some_endpoint.com'
       payload = { key: 'value' }
       interval = 500
+      id = 'some_id'
 
       expect(Unirest).to receive(:post).
         with(
@@ -27,9 +28,9 @@ RSpec.describe ScheduleWorker do
         )
 
       expect(ScheduleWorker).to receive(:perform_in).
-        with(interval.seconds, endpoint, payload, interval)
+        with(interval.seconds, id, endpoint, payload, interval)
 
-      ScheduleWorker.new.perform(endpoint, payload, interval)
+      ScheduleWorker.new.perform(id, endpoint, payload, interval)
     end
   end
 end
