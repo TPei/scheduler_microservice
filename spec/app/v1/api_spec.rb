@@ -19,7 +19,7 @@ RSpec.describe Api::ApiV1 do
       get '/documentation'
       expect(last_response.status).to eq 200
       expect(last_response.body.
-             include?('Pandemic BoardGame Backend API documentation')).to eq true
+             include?('Scheduler Microservice')).to eq true
       expect(last_response.body.
              include?('<small>version v1</small>')).to eq true
     end

@@ -1,6 +1,6 @@
 #%RAML 0.8
 ---
-title: Pandemic BoardGame Backend
+title:  Scheduler Microservice
 version: v1
 baseUri: http://todo.com
 #List of media type to support
@@ -30,14 +30,6 @@ traits:
             description: |
               Bad gateway.
               Application servers are down or under heavy load, please retry, backing off exponentially.
-  - preconditioned:
-      responses:
-        424:
-          description: |
-            A required precondition wasn't met, for example your session might not be valid
-        404:
-          description: |
-            The session_id you used does not exist
   - default:
       responses:
         200:
@@ -48,3 +40,35 @@ traits:
   is: [ default ]
   get:
     description: get hello world
+    responses:
+      200:
+        body:
+          schema: successGetSchema
+          example: !include examples/successGetResponse.json
+
+/schedule:
+  is: [ resilient, failable ]
+  post:
+    is: [ creating ]
+    description: schedules a job
+    body:
+      schema: schedulePost
+      example: !include examples/schedulePost.json
+    responses:
+      201:
+        body:
+          schema: schedulePostResponse
+          example: !include examples/schedulePostResponse.json
+  /{id}:
+    delete:
+      is: [ default ]
+      description: deletes a job
+      responses:
+        200:
+          body:
+            schema: scheduleDeleteSuccessResponse
+            example: !include examples/scheduleDeleteSuccessResponse.json
+        404:
+          body:
+            schema: scheduleDeleteFailResponse
+            example: !include examples/scheduleDeleteFailResponse.json
